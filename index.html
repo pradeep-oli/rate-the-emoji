@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji Rating App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .emoji-display {
+            font-size: 5em;
+            margin: 30px 0;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .rating-section {
+            margin: 30px 0;
+        }
+
+        .rating-section h3 {
+            color: #555;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .star-rating {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .star {
+            font-size: 2em;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .star:hover,
+        .star.active {
+            color: #ffd700;
+            transform: scale(1.2);
+        }
+
+        .star:hover {
+            text-shadow: 0 0 10px #ffd700;
+        }
+
+        .current-rating {
+            font-size: 1.2em;
+            color: #666;
+            margin: 15px 0;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .next-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .leaderboard-btn {
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            color: white;
+        }
+
+        .leaderboard-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .stats {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .stats h4 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .leaderboard {
+            display: none;
+            text-align: left;
+        }
+
+        .leaderboard.show {
+            display: block;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .leaderboard-item:last-child {
+            border-bottom: none;
+        }
+
+        .emoji-name {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+
+        .rating-info {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .back-btn {
+            background: linear-gradient(45deg, #a8edea, #fed6e3);
+            color: #333;
+            margin-top: 20px;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="ratingView">
+            <h1>🌟 Rate the Emoji! 🌟</h1>
+            <div class="emoji-display" id="currentEmoji">😊</div>
+            
+            <div class="rating-section">
+                <h3>How much do you like this emoji?</h3>
+                <div class="star-rating" id="starRating">
+                    <span class="star" data-rating="1">⭐</span>
+                    <span class="star" data-rating="2">⭐</span>
+                    <span class="star" data-rating="3">⭐</span>
+                    <span class="star" data-rating="4">⭐</span>
+                    <span class="star" data-rating="5">⭐</span>
+                </div>
+                <div class="current-rating" id="currentRating">Click a star to rate!</div>
+            </div>
+
+            <div class="buttons">
+                <button class="next-btn" id="nextBtn">Next Emoji</button>
+                <button class="leaderboard-btn" id="leaderboardBtn">View Leaderboard</button>
+            </div>
+
+            <div class="stats">
+                <h4>📊 Your Progress</h4>
+                <p>Emojis rated: <span id="totalRated">0</span></p>
+                <p>Average rating given: <span id="avgRating">0</span></p>
+            </div>
+        </div>
+
+        <div id="leaderboardView" class="leaderboard">
+            <h1>🏆 Emoji Leaderboard 🏆</h1>
+            <div id="leaderboardList"></div>
+            <button class="back-btn" id="backBtn">Back to Rating</button>
+        </div>
+    </div>
+
+    <script>
+        // Emoji database
+        const emojis = [
+            '😊', '😂', '🥰', '😍', '🤔', '😎', '🤗', '😢', '😡', '🤯',
+            '🥳', '😴', '🤤', '🙄', '😬', '🤐', '😱', '🤮', '🤠', '🥺',
+            '😈', '👻', '🤖', '💀', '🎉', '🎊', '🎈', '🎁', '🎂', '🍕',
+            '🍔', '🍟', '🍦', '🍩', '🍪', '🎵', '🎸', '🎮', '📱', '💻',
+            '🚀', '🌟', '⚡', '🔥', '💎', '🌈', '🦄', '🐶', '🐱', '🐼'
+        ];
+
+        // App state
+        let currentEmojiIndex = 0;
+        let ratings = {};
+        let userStats = {
+            totalRated: 0,
+            totalStars: 0
+        };
+        let currentRating = 0;
+
+        // DOM elements
+        const currentEmojiEl = document.getElementById('currentEmoji');
+        const starRatingEl = document.getElementById('starRating');
+        const currentRatingEl = document.getElementById('currentRating');
+        const nextBtn = document.getElementById('nextBtn');
+        const leaderboardBtn = document.getElementById('leaderboardBtn');
+        const backBtn = document.getElementById('backBtn');
+        const ratingView = document.getElementById('ratingView');
+        const leaderboardView = document.getElementById('leaderboardView');
+        const totalRatedEl = document.getElementById('totalRated');
+        const avgRatingEl = document.getElementById('avgRating');
+        const leaderboardList = document.getElementById('leaderboardList');
+
+        // Initialize app
+        function init() {
+            shuffleEmojis();
+            displayCurrentEmoji();
+            setupEventListeners();
+            updateStats();
+        }
+
+        // Shuffle emojis array
+        function shuffleEmojis() {
+            for (let i = emojis.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [emojis[i], emojis[j]] = [emojis[j], emojis[i]];
+            }
+        }
+
+        // Display current emoji
+        function displayCurrentEmoji() {
+            currentEmojiEl.textContent = emojis[currentEmojiIndex];
+            resetStars();
+            
+            // Show existing rating if available
+            const emoji = emojis[currentEmojiIndex];
+            if (ratings[emoji]) {
+                setStarRating(ratings[emoji]);
+                currentRatingEl.textContent = `You rated this ${ratings[emoji]} star${ratings[emoji] !== 1 ? 's' : ''}`;
+            } else {
+                currentRatingEl.textContent = 'Click a star to rate!';
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Star rating
+            starRatingEl.addEventListener('click', (e) => {
+                if (e.target.classList.contains('star')) {
+                    const rating = parseInt(e.target.dataset.rating);
+                    rateEmoji(rating);
+                }
+            });
+
+            // Star hover effects
+            starRatingEl.addEventListener('mouseover', (e) => {
+                if (e.target.classList.contains('star')) {
+                    const rating = parseInt(e.target.dataset.rating);
+                    highlightStars(rating);
+                }
+            });
+
+            starRatingEl.addEventListener('mouseout', () => {
+                resetStars();
+                if (currentRating > 0) {
+                    setStarRating(currentRating);
+                }
+            });
+
+            // Buttons
+            nextBtn.addEventListener('click', nextEmoji);
+            leaderboardBtn.addEventListener('click', showLeaderboard);
+            backBtn.addEventListener('click', showRatingView);
+        }
+
+        // Rate emoji
+        function rateEmoji(rating) {
+            const emoji = emojis[currentEmojiIndex];
+            const wasNewRating = !ratings[emoji];
+            
+            if (wasNewRating) {
+                userStats.totalRated++;
+            } else {
+                userStats.totalStars -= ratings[emoji];
+            }
+            
+            ratings[emoji] = rating;
+            userStats.totalStars += rating;
+            currentRating = rating;
+            
+            setStarRating(rating);
+            currentRatingEl.textContent = `You rated this ${rating} star${rating !== 1 ? 's' : ''}!`;
+            updateStats();
+        }
+
+        // Highlight stars
+        function highlightStars(rating) {
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        // Set star rating
+        function setStarRating(rating) {
+            highlightStars(rating);
+        }
+
+        // Reset stars
+        function resetStars() {
+            const stars = document.querySelectorAll('.star');
+            stars.forEach(star => star.classList.remove('active'));
+        }
+
+        // Next emoji
+        function nextEmoji() {
+            currentEmojiIndex = (currentEmojiIndex + 1) % emojis.length;
+            currentRating = 0;
+            displayCurrentEmoji();
+        }
+
+        // Update stats
+        function updateStats() {
+            totalRatedEl.textContent = userStats.totalRated;
+            const avgRating = userStats.totalRated > 0 ? (userStats.totalStars / userStats.totalRated).toFixed(1) : '0';
+            avgRatingEl.textContent = avgRating;
+        }
+
+        // Show leaderboard
+        function showLeaderboard() {
+            ratingView.style.display = 'none';
+            leaderboardView.classList.add('show');
+            generateLeaderboard();
+        }
+
+        // Show rating view
+        function showRatingView() {
+            ratingView.style.display = 'block';
+            leaderboardView.classList.remove('show');
+        }
+
+        // Generate leaderboard
+        function generateLeaderboard() {
+            const sortedEmojis = Object.entries(ratings)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 10);
+
+            leaderboardList.innerHTML = '';
+            
+            if (sortedEmojis.length === 0) {
+                leaderboardList.innerHTML = '<p style="text-align: center; color: #666;">No ratings yet! Start rating some emojis!</p>';
+                return;
+            }
+
+            sortedEmojis.forEach(([emoji, rating], index) => {
+                const item = document.createElement('div');
+                item.className = 'leaderboard-item';
+                
+                const rank = index + 1;
+                const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
+                
+                item.innerHTML = `
+                    <div>
+                        <span class="emoji-name">${emoji}</span>
+                        <span>${medal}</span>
+                    </div>
+                    <div class="rating-info">
+                        ${'⭐'.repeat(rating)} (${rating}/5)
+                    </div>
+                `;
+                
+                leaderboardList.appendChild(item);
+            });
+        }
+
+        // Initialize the app
+        init();
+    </script>
+</body>
+</html>
